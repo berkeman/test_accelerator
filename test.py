@@ -110,3 +110,11 @@ wds = test.new(num_workdirs=2)
 test.configure(defined_workdirs=wds, target=wds[0], sources=wds, num_slices=(3, 4))
 parsed, output = test.run()
 assert not parsed['serving'] and 'ERROR:  Not all workdirs have the same number of slices!' in output[0]
+
+# define 0, 1; source 0, 1; twist: no target cause errors
+wds = test.new(num_workdirs=2)
+test.configure(defined_workdirs=wds, sources=wds)
+parsed, output = test.run()
+assert not parsed['serving'] and '# Error in configfile, must specify target_workdir.' in output[0]
+
+
