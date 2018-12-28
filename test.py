@@ -52,9 +52,15 @@ class Test:
 	def run(self):
 		print('Run ' + self.current_testpath)
 		command = 'cd accelerator; exec ./daemon.py --conf=' + os.path.join(self.current_testpath, 'test.conf')
-		stdout = Command(command).run(timeout=2)
-		parsed = self._parse(stdout)
-		return parsed, stdout
+		out = Command(command).run(timeout=2)
+		parsed = self._parse(out)
+		self._save('stdout.txt', '\n'.join(out[0]))
+		self._save('stderr.txt', '\n'.join(out[1]))
+		return parsed, out
+
+	def _save(self, fname, x):
+		with open(os.path.join(self.current_testpath, fname), 'wt') as fh:
+			fh.write(x)
 
 	def _parse(self,data):
 		from re import match, search
