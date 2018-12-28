@@ -18,7 +18,6 @@ class Test:
 		with open(configfile_template, 'rt') as fh:
 			conf = fh.read().split('\n')
 			self.conf = [line for line in conf if line.startswith('py')]
-		print(self.conf)
 		# re-create testdir
 		# in the future, move existing testdir to timestamped dir
 		from shutil import rmtree
@@ -52,6 +51,7 @@ class Test:
 			fh.write('\n'.join(conf))
 
 	def run(self):
+		print('Run ' + self.current_testpath)
 		command = 'cd accelerator; exec ./daemon.py --conf=' + os.path.join(self.current_testpath, 'test.conf')
 		stdout = Command(command).run(timeout=2)
 		parsed = self._parse(stdout)
