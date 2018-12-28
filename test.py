@@ -36,10 +36,14 @@ class Test:
 			os.mkdir(os.path.join(self.current_testpath, wd))
 		return self.wdnames
 
-	def configure(self, defined_workdirs=None, target=None, sources=None):
+	def configure(self, defined_workdirs=None, target=None, sources=None, num_slices=3):
+		if isinstance(num_slices, int):
+			num_slices = [num_slices] * len(defined_workdirs)
+		else:
+			assert len(num_slices) == len(defined_workdirs), 'expect either one int for all or one int for each.'
 		conf = self.conf[:] # copy
-		for wd in defined_workdirs:
-			conf.insert(0, 'workdir=%s:%s:3' % (wd, os.path.join(self.current_testpath, wd),))
+		for wd, slices in zip(defined_workdirs, num_slices):
+			conf.insert(0, 'workdir=%s:%s:%d' % (wd, os.path.join(self.current_testpath, wd), slices))
 		if target:
 			conf.insert(-1, 'target_workdir=%s' % (target,))
 		if sources:
@@ -99,6 +103,12 @@ wds = test.new(num_workdirs=2)
 test.configure(defined_workdirs=wds, target=wds[0], sources=wds[:1])
 parsed, output = test.run()
 assert parsed['created'] == {wds[0]} and parsed['target'] == wds[0] and parsed['sources'] is None
+
+# define 0, 1; target 0; source 0, 1; => create 0, 1; twist: uneven sliceno cause error
+wds = test.new(num_workdirs=2)
+test.configure(defined_workdirs=wds, target=wds[0], sources=wds, num_slices=(3, 4))
+parsed, output = test.run()
+assert 'ERROR:  Not all workdirs have the same number of slices!' in output[0]
 
 
 
