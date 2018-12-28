@@ -37,14 +37,13 @@ class Test:
 		return self.wdnames
 
 	def configure(self, defined_workdirs=None, target=None, sources=None):
-		conf = self.conf
+		conf = self.conf[:] # copy
 		for wd in defined_workdirs:
 			conf.insert(0, 'workdir=%s:%s:3' % (wd, os.path.join(self.current_testpath, wd),))
 		if target:
 			conf.insert(-1, 'target_workdir=%s' % (target,))
 		if sources:
 			conf.insert(-1, 'source_workdirs=' + ','.join(sources))
-
 		conf.insert(-1, 'logfilename=' + os.path.join(self.current_testpath, 'log.txt'))
 		conf.insert(-1, 'method_directories=standard_methods')
 		with open(os.path.join(self.current_testpath, 'test.conf'), 'wt') as fh:
