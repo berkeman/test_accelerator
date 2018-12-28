@@ -76,16 +76,30 @@ class Test:
 				target = search('TARGET\\x1b\[1m   (\w+):', line).group(1)
 			elif 'SOURCE' in line:
 				sources.append(search('SOURCE   (\w+):', line).group(1))
-		return {'created': set(created), 'sources': set(sources), 'target': target}
+		return {'created': set(created) if created else None, 'sources': set(sources) if sources else None, 'target': target if target else None}
+
 
 
 test = Test(path = os.path.join(os.getcwd(), '____test'))
 
-# create 0,1; target 0; source 1
+# define 0, 1; target 0; source 1; => create 0, 1
 wds = test.new(num_workdirs=2)
 test.configure(defined_workdirs=wds, target=wds[0], sources=wds[1:])
 parsed, output = test.run()
 assert parsed['created'] == set(wds) and parsed['target'] == wds[0] and parsed['sources'] == {wds[1]}
+
+# define 0, 1; target 0; => create 0
+wds = test.new(num_workdirs=2)
+test.configure(defined_workdirs=wds, target=wds[0])
+parsed, output = test.run()
+assert parsed['created'] == {wds[0]} and parsed['target'] == wds[0] and parsed['sources'] is None
+
+# define 0, 1; target 0; source 0; => create 0
+wds = test.new(num_workdirs=2)
+test.configure(defined_workdirs=wds, target=wds[0], sources=wds[:1])
+parsed, output = test.run()
+assert parsed['created'] == {wds[0]} and parsed['target'] == wds[0] and parsed['sources'] is None
+
 
 
 
