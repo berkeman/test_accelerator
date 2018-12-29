@@ -4,30 +4,30 @@ import threading
 
 class Command(object):
 	# Run shell commands with timeout
-    def __init__(self, cmd):
-        self.cmd = cmd
-        self.process = None
-        self.out = None
+	def __init__(self, cmd):
+		self.cmd = cmd
+		self.process = None
+		self.out = None
 
-    def _stringer(self, x):
-        if x:
-            return tuple(line.decode('utf-8') for line in x.splitlines())
-        else:
-            return ()
+	def _stringer(self, x):
+		if x:
+			return tuple(line.decode('utf-8') for line in x.splitlines())
+		else:
+			return ()
 
-    def run_command(self):
-        self.process = subprocess.Popen(self.cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-        out, err = self.process.communicate()
-        self.out = tuple(map(self._stringer, (out, err)))
+	def run_command(self):
+		self.process = subprocess.Popen(self.cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
+		out, err = self.process.communicate()
+		self.out = tuple(map(self._stringer, (out, err)))
 
-    def run(self, timeout = 10):
-        thread = threading.Thread(target=self.run_command)
-        thread.start()
-        thread.join(timeout)
-        if thread.is_alive():
-            self.process.terminate()
-            thread.join()
-        return self.out
+	def run(self, timeout = 10):
+		thread = threading.Thread(target=self.run_command)
+		thread.start()
+		thread.join(timeout)
+		if thread.is_alive():
+			self.process.terminate()
+			thread.join()
+		return self.out
 
 
 class Test:
