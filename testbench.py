@@ -3,7 +3,7 @@ import subprocess
 import threading
 
 class Command(object):
-	# Run system commands with timeout
+	# Run shell commands with timeout
     def __init__(self, cmd):
         self.cmd = cmd
         self.process = None
@@ -17,7 +17,7 @@ class Command(object):
 
     def run_command(self):
         self.process = subprocess.Popen(self.cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, stdin=subprocess.PIPE)
-        out,err = self.process.communicate()
+        out, err = self.process.communicate()
         self.out = tuple(map(self._stringer, (out, err)))
 
     def run(self, timeout = 10):
