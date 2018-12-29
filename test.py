@@ -4,8 +4,8 @@ import os
 from testbench import Test
 
 CONF = 'conf/test.conf'
-
-test = Test(path = os.path.join(os.getcwd(), '____test'), configfile_template=CONF)
+PATH = '____test'
+test = Test(path = os.path.join(os.getcwd(), PATH), configfile_template=CONF)
 
 # define 0, 1; target 0; source 1; => create 0, 1
 wds = test.new(num_workdirs=2)
