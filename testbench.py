@@ -32,6 +32,12 @@ class Command(object):
 
 class Test:
 	def __init__(self, path='./', configfile_template=None):
+		""" Set up a directory (in path) where a consecutive number of
+		tests may be executed in separate directories.
+		An accelerator configuration file is read in order to find the
+		current py2 and py3 variables so that new config files may be
+		created.
+		"""
 		self.ix = -1
 		self.path = path
 		self.current_testpath = None
@@ -47,6 +53,10 @@ class Test:
 		os.mkdir(path)
 
 	def new(self, num_workdirs=3):
+		""" Creates a new 'TEST%d'-directory ("current test directory"),
+		in which num_workdirs workdirs are created.  It returns a tuple
+		of names of the workdirs created.
+		"""
 		# create new testdir + workdirs
 		self.ix += 1
 		self.current_testpath =(os.path.join(self.path, 'TEST' + str(self.ix)))
@@ -57,6 +67,10 @@ class Test:
 		return self.wdnames
 
 	def configure(self, defined_workdirs=None, target=None, sources=None, num_slices=3):
+		""" Create a configuration file based on the initial
+		configuration file and input parameters.  The file is stored in
+		the current test directory.
+		"""
 		conf = self.conf[:] # copy
 		if isinstance(num_slices, int):
 			num_slices = [num_slices] * len(defined_workdirs)
@@ -74,6 +88,10 @@ class Test:
 			fh.write('\n'.join(conf))
 
 	def run(self):
+		""" Run the accelerator using the configuration file and workdirs
+		stored in the current test directory.  Output is also stored
+		there.
+		"""
 		print('Run ' + self.current_testpath)
 		command = 'cd accelerator; exec ./daemon.py --conf=' + os.path.join(self.current_testpath, 'test.conf')
 		out = Command(command).run(timeout=1)
@@ -87,6 +105,7 @@ class Test:
 			fh.write(x)
 
 	def _parse(self, data):
+		# parse accelerator stderr and stdout
 		from re import match, search
 		created = []
 		sources = []
